@@ -91,6 +91,9 @@ def get_args_parser():
     parser.add_argument('--pin_mem', action='store_true',
                         help='Pin CPU memory in DataLoader for more efficient (sometimes) transfer to GPU.')
     parser.add_argument('--no_pin_mem', action='store_false', dest='pin_mem')
+    parser.add_argument('--timestamp_dir', default=True, type=bool,
+                        help='Create directory with name of time stamp inside logging/output folders.')
+    parser.add_argument('--no_timestamp_dir', action='store_false', dest='timestamp_dir')
     parser.set_defaults(pin_mem=True)
 
     # distributed training parameters
@@ -216,6 +219,15 @@ def main(args):
 if __name__ == '__main__':
     args = get_args_parser()
     args = args.parse_args()
+
+    if args.timestamp_dir:
+        timestamp = "{0:%Y-%m-%d__%H-%M-%S/}".format(datetime.datetime.now())
+        if args.log_dir is not None:
+            args.log_dir = os.path.join(args.log_dir, timestamp)
+
+        if args.output_dir:
+            args.output_dir = os.path.join(args.output_dir, timestamp)
+
     if args.output_dir:
         Path(args.output_dir).mkdir(parents=True, exist_ok=True)
     main(args)
