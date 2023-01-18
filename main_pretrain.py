@@ -223,7 +223,7 @@ if __name__ == '__main__':
     args = args.parse_args()
 
     if args.timestamp_dir:
-        timestamp = "{0:%Y-%m-%d__%H-%M-%S/}".format(datetime.datetime.now())
+        timestamp = "mae_{0:%Y-%m-%d__%H-%M-%S/}".format(datetime.datetime.now())
         if args.log_dir is not None:
             args.log_dir = os.path.join(args.log_dir, timestamp)
 
