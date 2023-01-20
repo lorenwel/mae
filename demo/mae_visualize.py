@@ -4,6 +4,7 @@ import requests
 
 import torch
 import numpy as np
+from sklearn.decomposition import PCA
 
 import matplotlib.pyplot as plt
 from PIL import Image
@@ -46,6 +47,15 @@ def run_one_image(img, model):
     y = model.unpatchify(y)
     y = torch.einsum('nchw->nhwc', y).detach().cpu()
 
+    # Get encoder features without mask.
+    latent, mask, ids_restore = model.forward_encoder(x.float(), 0.0)
+    latent = latent[:,1:].detach().cpu()
+    latent = torch.gather(latent, dim=1, index=ids_restore.unsqueeze(-1).repeat(1, 1, latent.shape[1]))  # unshuffle
+    pca = PCA(n_components=3)
+    latent_pca = pca.fit_transform(latent[0])
+    latent_pca = latent_pca.reshape(14,14,3)
+    latent_pca = (latent_pca - latent_pca.min()) / (latent_pca.max() - latent_pca.min())    # Normalize.
+
     # visualize the mask
     mask = mask.detach()
     mask = mask.unsqueeze(-1).repeat(1, 1, model.patch_embed.patch_size[0]**2 *3)  # (N, H*W, p*p*3)
@@ -63,17 +73,22 @@ def run_one_image(img, model):
     # make the plt figure larger
     plt.rcParams['figure.figsize'] = [24, 24]
 
-    plt.subplot(1, 4, 1)
+    plt.subplot(1, 5, 1)
     show_image(x[0], "original")
 
-    plt.subplot(1, 4, 2)
+    plt.subplot(1, 5, 2)
     show_image(im_masked[0], "masked")
 
-    plt.subplot(1, 4, 3)
+    plt.subplot(1, 5, 3)
     show_image(y[0], "reconstruction")
 
-    plt.subplot(1, 4, 4)
+    plt.subplot(1, 5, 4)
     show_image(im_paste[0], "reconstruction + visible")
+
+    plt.subplot(1, 5, 5)
+    plt.imshow(latent_pca)
+    plt.title('encoder latent', fontsize=16)
+    plt.axis('off')
 
     plt.show()
 
