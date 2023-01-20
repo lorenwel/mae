@@ -97,9 +97,10 @@ show_image(torch.tensor(img))
 # This is an MAE model trained with pixels as targets for visualization (ViT-Large, training mask ratio=0.75)
 
 
-chkpt_dir = 'mae_visualize_vit_base.pth'
+# chkpt_dir = 'mae_visualize_vit_base.pth'
 # chkpt_dir = '../logs/checkpoint-0.pth'
-# chkpt_dir = '/tmp/scratch/logs/mae_2023-01-18__22-55-32/checkpoint-10.pth'
+chkpt_dir = '/tmp/scratch/logs/mae_2023-01-18__22-55-32/checkpoint-20.pth'
+# chkpt_dir = '/tmp/scratch/logs/mae_2023-01-19__12-43-57/checkpoint-25.pth'
 print('Loading model...')
 model_mae = prepare_model(chkpt_dir, 'mae_vit_base_patch16')
 print('Model loaded.')
